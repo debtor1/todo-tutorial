@@ -143,6 +143,75 @@ describe("TodoItem", () => {
   });
 });
 
+describe("TodoItem 편집 - 진입/취소/커밋", () => {
+  it("더블클릭하면 편집 모드로 진입하고 입력값에 기존 텍스트가 채워진다", async () => {
+    const user = userEvent.setup();
+    render(
+      <TodoItem
+        todo={makeTodo({ text: "원본 텍스트" })}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+      />
+    );
+
+    await user.dblClick(screen.getByText("원본 텍스트"));
+
+    expect(screen.getByRole("textbox", { name: "할 일 편집" })).toHaveValue(
+      "원본 텍스트"
+    );
+  });
+
+  it("Escape로 취소하면 draft가 원래 텍스트로 되돌아가고 onEdit은 호출되지 않는다", async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    render(
+      <TodoItem
+        todo={makeTodo({ text: "원본 텍스트" })}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+
+    await user.dblClick(screen.getByText("원본 텍스트"));
+    const input = screen.getByRole("textbox", { name: "할 일 편집" });
+    fireEvent.change(input, { target: { value: "변경중" } });
+
+    fireEvent.keyDown(input, { key: "Escape" });
+
+    expect(onEdit).not.toHaveBeenCalled();
+    expect(screen.getByText("원본 텍스트")).toBeInTheDocument();
+
+    // 다시 편집 모드로 들어가도 draft가 원본으로 초기화돼 있어야 한다
+    await user.dblClick(screen.getByText("원본 텍스트"));
+    expect(screen.getByRole("textbox", { name: "할 일 편집" })).toHaveValue(
+      "원본 텍스트"
+    );
+  });
+
+  it("입력값을 바꾸고 포커스를 벗어나면(blur) onEdit이 호출된다", async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    render(
+      <TodoItem
+        todo={makeTodo({ id: "abc", text: "원본 텍스트" })}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+
+    await user.dblClick(screen.getByText("원본 텍스트"));
+    const input = screen.getByRole("textbox", { name: "할 일 편집" });
+    fireEvent.change(input, { target: { value: "블러로 저장" } });
+
+    fireEvent.blur(input);
+
+    expect(onEdit).toHaveBeenCalledExactlyOnceWith("abc", "블러로 저장");
+  });
+});
+
 describe("TodoItem 편집 - IME 조합 중 Enter", () => {
   it("IME 조합 확정용 Enter(isComposing=true)는 편집을 커밋하지 않는다", async () => {
     const user = userEvent.setup();
