@@ -9,6 +9,7 @@
 - 키워드 검색, 상태(전체/진행중/완료)·카테고리별 필터링
 - 생성일순·이름순·마감일순 정렬
 - 다크 모드 지원 (`d` 키로 토글)
+- 로컬 스토리지에 자동 저장되어 새로고침 후에도 유지
 
 ## 관련 링크
 
@@ -20,9 +21,10 @@
 - Next.js 16 (App Router, Turbopack)
 - React 19
 - Tailwind CSS v4
-- shadcn/ui (radix-maia 스타일, taupe 베이스)
+- shadcn/ui (radix-mira 스타일, taupe 베이스, phosphor 아이콘)
 - TypeScript / ESLint / Prettier
-- 패키지 매니저: bun 1.3.6
+- Vitest / Testing Library
+- 패키지 매니저: bun
 
 ## 시작하기
 
@@ -42,15 +44,8 @@ bun run start      # 빌드 결과 실행
 bun run lint       # ESLint
 bun run typecheck  # tsc --noEmit
 bun run format     # Prettier 포맷팅
-bun run test       # Vitest 테스트 실행
-```
-
-## 챕터별 시작 브랜치
-
-각 레슨은 시작 시점의 코드 상태를 브랜치로 제공합니다. 레슨 본문에서 안내하는 브랜치로 전환한 뒤 따라가시면 됩니다.
-
-```shell
-git checkout ch02-03
+bun run test       # Vitest 테스트 실행 (1회)
+bun run test:watch # Vitest 테스트 실행 (watch 모드)
 ```
 
 ## 컴포넌트 추가
